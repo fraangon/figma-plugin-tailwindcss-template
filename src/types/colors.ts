@@ -9,3 +9,7 @@ export interface HSL {
   s: number;
   l: number;
 }
+
+export interface ColorElement extends RGB {
+  times: number;
+}

@@ -19,7 +19,6 @@ export function colorsToColorsWithUses(
     });
 
     if (existingColor) {
-      console.log("EXISTING COLOR: ", existingColor);
       existingColor.uses.push({
         nodeId: color.nodeId,
         property: color.property,

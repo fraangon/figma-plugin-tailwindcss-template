@@ -21,16 +21,23 @@ export default function ColorsPage({
       </div>
 
       <div className="flex flex-col justify-start items-start gap-2 w-full">
-        {colorsWithUses.map((color) => {
-          return (
-            <Color
-              key={getColorKey(color)}
-              color={color}
-              variables={variables}
-              onColorReplace={onColorReplace}
-            />
-          );
-        })}
+        {colorsWithUses
+          .sort((a, b) => {
+            if (b.uses.length !== a.uses.length)
+              return b.uses.length - a.uses.length;
+
+            return b.variable ? 1 : a.variable ? -1 : 0;
+          })
+          .map((color) => {
+            return (
+              <Color
+                key={getColorKey(color)}
+                color={color}
+                variables={variables}
+                onColorReplace={onColorReplace}
+              />
+            );
+          })}
       </div>
     </div>
   );

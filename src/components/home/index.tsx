@@ -1,47 +1,53 @@
 import { useMemo, useState } from "react";
-import { rgbToHex, rgbToHsl } from "../../utils/colors";
-import cn from "classnames";
-import Color from "../ui/color";
+import { SidebarWrapper } from "../sidebar-wrapper";
+import { TooltipProvider } from "../ui/tooltip";
+
+const getColorKey = (color: Color) => {
+  return color.variable
+    ? `${color.variable?.id}-${color.r}-${color.g}-${color.b}`
+    : `${color.r}-${color.g}-${color.b}`;
+};
 
 export const Home = () => {
   const [components, setComponents] = useState([]);
+  const [variables, setVariables] = useState([]);
 
   onmessage = async (event: MessageEvent) => {
     const pluginMessage = event.data.pluginMessage;
+
     if (pluginMessage.type === "selection-change") {
       const components = pluginMessage.selectedComponents;
-      setComponents(components);
+      const variables = pluginMessage.variables;
+      setComponents(components || []);
+      setVariables(variables || []);
     }
   };
+
+  console.log("variables", variables);
 
   const colors = useMemo(() => {
     return components
       .flatMap((component) => component.colors)
       .reduce((acc, color) => {
-        const key = `${color.r}-${color.g}-${color.b}`;
-        const existingColor = acc.find((c) => `${c.r}-${c.g}-${c.b}` === key);
+        const variable = variables.find((v) => v.id === color.variable?.id);
+
+        const existingColor = acc.find(
+          (c) => getColorKey(c) === getColorKey(color)
+        );
 
         if (existingColor) existingColor.times++;
-        else acc.push({ ...color, times: 1 });
+        else acc.push({ ...color, times: 1, variable: variable?.name });
 
         return acc;
       }, [])
       .sort((a, b) => b.times - a.times);
   }, [components]);
 
-  return (
-    <div className="h-fit min-h-screen w-full flex flex-col justify-start items-start px-2 py-3 gap-3 bg-black font-mono">
-      <h1 className="font-medium text-gray-500 text-sm leading-none tracking-wide uppercase">
-        <span>Normalizer</span>
-        <span> / </span>
-        <span className="text-gray-50">Colors</span>
-      </h1>
+  console.log("colors", colors);
 
-      <div className="flex flex-col justify-start items-start gap-2 w-full">
-        {colors.map((color) => (
-          <Color color={color} key={`${color.r}-${color.g}-${color.b}`} />
-        ))}
-      </div>
-    </div>
+  return (
+    <TooltipProvider>
+      <SidebarWrapper colors={colors} />
+    </TooltipProvider>
   );
 };

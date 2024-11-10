@@ -1,20 +1,36 @@
-export async function getColors(node: SceneNode): Promise<Array<{
-  r: number;
-  g: number;
-  b: number;
-  boundVariables?: any | undefined;
-}>> {
-  const nodesWithPaint = findNodesWithPaint(node);
+import { convertToRGBScale } from "./colors";
+
+export async function getColors(node: SceneNode): Promise<
+  Array<{
+    r: number;
+    g: number;
+    b: number;
+    variable?: any | undefined;
+  }>
+> {
+  const nodesWithPaint = [node, ...findNodesWithPaint(node)];
+
   return extractColorsFromNodes(nodesWithPaint);
 }
 
 function findNodesWithPaint(node: SceneNode): SceneNode[] {
-  return (node as FrameNode | GroupNode).findAllWithCriteria({
-    types: [
-      "RECTANGLE", "ELLIPSE", "POLYGON", "STAR", "VECTOR",
-      "TEXT", "FRAME", "COMPONENT", "INSTANCE",
-    ],
-  });
+  if (node.type === "FRAME" || node.type === "GROUP") {
+    return (node as FrameNode | GroupNode).findAllWithCriteria({
+      types: [
+        "RECTANGLE",
+        "ELLIPSE",
+        "POLYGON",
+        "STAR",
+        "VECTOR",
+        "TEXT",
+        "FRAME",
+        "COMPONENT",
+        "INSTANCE",
+      ],
+    });
+  }
+
+  return [];
 }
 
 function extractColorsFromNodes(nodes: SceneNode[]): Array<{
@@ -23,13 +39,16 @@ function extractColorsFromNodes(nodes: SceneNode[]): Array<{
   b: number;
   boundVariables?: any | undefined;
 }> {
-  return nodes.flatMap(node => [
-    ...extractColorsFromProperty(node, 'fills'),
-    ...extractColorsFromProperty(node, 'strokes')
+  return nodes.flatMap((node) => [
+    ...extractColorsFromProperty(node, "fills"),
+    ...extractColorsFromProperty(node, "strokes"),
   ]);
 }
 
-function extractColorsFromProperty(node: SceneNode, property: 'fills' | 'strokes'): Array<{
+function extractColorsFromProperty(
+  node: SceneNode,
+  property: "fills" | "strokes"
+): Array<{
   r: number;
   g: number;
   b: number;
@@ -38,14 +57,11 @@ function extractColorsFromProperty(node: SceneNode, property: 'fills' | 'strokes
   if (!(property in node) || !Array.isArray(node[property])) return [];
 
   return node[property]
-    .filter(paint => paint.type === "SOLID")
-    .map(paint => {
-      const { r, g, b } = paint.color;
+    .filter((paint) => paint.type === "SOLID")
+    .map((paint) => {
       return {
-        r: Math.round(r * 255),
-        g: Math.round(g * 255),
-        b: Math.round(b * 255),
-        boundVariables: property === 'fills' ? paint.boundVariables : undefined
+        ...convertToRGBScale(paint.color),
+        variable: paint.boundVariables?.color,
       };
     });
 }

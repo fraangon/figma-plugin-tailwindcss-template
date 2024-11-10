@@ -96,3 +96,18 @@ export function hslToRgb(hsl: HSL): RGB {
     b: Math.round(b * 255),
   };
 }
+
+export function convertToRGBScale(color: {
+  r: number;
+  g: number;
+  b: number;
+  a?: number;
+}): RGBA {
+  return {
+    r: Math.round(color.r * 255),
+    g: Math.round(color.g * 255),
+    b: Math.round(color.b * 255),
+    a: color.a || 1,
+  };
+}
+

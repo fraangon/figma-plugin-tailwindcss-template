@@ -1,12 +1,10 @@
 import { useMemo, useState } from "react";
 import { SidebarWrapper } from "../sidebar-wrapper";
 import { TooltipProvider } from "../ui/tooltip";
+import { ColorElement } from "../../types/colors";
+import { getColorKey } from "./utils";
 
-const getColorKey = (color: Color) => {
-  return color.variable
-    ? `${color.variable?.id}-${color.r}-${color.g}-${color.b}`
-    : `${color.r}-${color.g}-${color.b}`;
-};
+
 
 export const Home = () => {
   const [components, setComponents] = useState([]);
@@ -40,7 +38,10 @@ export const Home = () => {
 
         return acc;
       }, [])
-      .sort((a, b) => b.times - a.times);
+      .sort((a, b) => {
+        if (b.times !== a.times) return b.times - a.times;
+        return (b.variable ? 1 : 0) - (a.variable ? 1 : 0);
+      });
   }, [components]);
 
   console.log("colors", colors);

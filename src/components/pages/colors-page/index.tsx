@@ -1,4 +1,5 @@
 import { ColorElement } from "../../../types/colors";
+import { getColorKey } from "../../home/utils";
 import Color from "../../ui/color";
 
 export default function ColorsPage({ colors }: { colors: ColorElement[] }) {
@@ -12,7 +13,7 @@ export default function ColorsPage({ colors }: { colors: ColorElement[] }) {
 
       <div className="flex flex-col justify-start items-start gap-2 w-full">
         {colors.map((color) => (
-          <Color color={color} key={`${color.r}-${color.g}-${color.b}`} />
+          <Color color={color} key={getColorKey(color)} />
         ))}
       </div>
     </div>

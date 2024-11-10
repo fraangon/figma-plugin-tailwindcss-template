@@ -24,3 +24,30 @@ export interface ComponentWithColors {
   name: string;
   colors: ColorElement[];
 }
+
+export interface ColorWithUses {
+  id: string;
+  r: number;
+  g: number;
+  b: number;
+  a?: number;
+  variable?: {
+    id: string;
+    type: string;
+  };
+  uses: Array<{ nodeId: string; property: "fills" | "strokes" }>;
+}
+
+export interface ColorUse {
+  id: string;
+  r: number;
+  g: number;
+  b: number;
+  a?: number;
+  variable?: {
+    id: string;
+    type: string;
+  };
+  nodeId: string;
+  property: "fills" | "strokes";
+}

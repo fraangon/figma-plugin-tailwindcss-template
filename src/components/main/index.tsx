@@ -28,7 +28,7 @@ const SidebarItem = ({
   );
 };
 
-export const SidebarWrapper = (props: any) => {
+export const Main = (props: any) => {
   return (
     <Tabs defaultValue={ITEMS[0].id} className="w-full h-full flex flex-row">
       <div className="w-fit h-full bg-gray-100 border-r border-gray-200/50">

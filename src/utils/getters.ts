@@ -1,6 +1,7 @@
 import { getColorKey } from "../components/home/utils";
-import { ColorElement, ColorUse, ColorWithUses } from "../types/colors";
-import { convertToRGBScale } from "./colors";
+import { ColorUse, ColorWithUses } from "../types/colors";
+import { clone } from "./clone";
+import { convertToRGBScale, rgbToHex } from "./colors";
 
 export async function getColors(node: SceneNode): Promise<Array<ColorUse>> {
   const nodesWithPaint = [node, ...findNodesWithPaint(node)];
@@ -81,21 +82,6 @@ function extractColorsFromProperty(
     }));
 }
 
-export function changeFillColor(node: SceneNode, newColor: ColorElement) {
-  if ("fills" in node) {
-    node.fills = [
-      {
-        type: "SOLID",
-        color: {
-          r: newColor.r,
-          g: newColor.g,
-          b: newColor.b,
-        },
-      },
-    ];
-  }
-}
-
 export function getVariables(collections: VariableCollection[]) {
   return collections.reduce((acc, collection) => {
     const collectionVariables = collection.variableIds
@@ -116,4 +102,45 @@ export function getVariables(collections: VariableCollection[]) {
 
     return [...acc, ...collectionVariables];
   }, [] as any[]);
+}
+
+export function replaceColor(color: ColorWithUses, newColor: ColorWithUses) {
+  color.uses.forEach((use) => {
+    const node = figma.getNodeById(use.nodeId);
+
+    if (node && use.property in node) {
+      const property = use.property; // 'fills' or 'strokes'
+      const properties = node[property];
+
+      if (properties[0]?.type === "SOLID") {
+        const clonedProperties = clone(properties);
+
+        console.log("replaceColor:newColor", newColor);
+        const newHex = rgbToHex(newColor);
+        const newSolidPaint = figma.util.solidPaint(
+          newHex,
+          clonedProperties[0]
+        );
+        if (newColor.variable) {
+          if ("setBoundVariable" in node) {
+            const variable = figma.variables.getVariableById(
+              newColor.variable.id
+            );
+            const newSolidPaintWithVariable =
+              figma.variables.setBoundVariableForPaint(
+                newSolidPaint,
+                "color",
+                variable
+              );
+            clonedProperties[0] = newSolidPaintWithVariable;
+            node[property] = clonedProperties;
+          } else {
+            clonedProperties[0] = newSolidPaint;
+
+            node[property] = clonedProperties;
+          }
+        }
+      }
+    }
+  });
 }

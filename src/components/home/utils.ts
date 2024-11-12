@@ -1,5 +1,3 @@
-import { ColorUse } from "../../types/colors";
-
 export const getColorKey = ({
   r,
   g,

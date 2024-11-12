@@ -30,8 +30,8 @@ const SidebarItem = ({
 
 export const Main = (props: any) => {
   return (
-    <Tabs defaultValue={ITEMS[0].id} className="w-full h-full flex flex-row">
-      <div className="w-fit h-full bg-gray-100 border-r border-gray-200/50">
+    <Tabs defaultValue={ITEMS[0].id} className="w-full h-full flex flex-row max-h-[600px]">
+      <div className="w-fit h-full bg-gray-100 border-r border-gray-200/50 max-h-[600px]">
         <div className="flex flex-col justify-start items-center gap-2 p-2">
           <TabsList className="flex flex-col gap-2 bg-transparent">
             {ITEMS.map((item) => (
@@ -45,7 +45,7 @@ export const Main = (props: any) => {
           </TabsList>
         </div>
       </div>
-      <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full flex flex-col max-h-[600px] overflow-hidden">
         {ITEMS.map((item) => (
           <TabsContent key={item.id} value={item.id} className="w-full h-full">
             <item.component {...props} />

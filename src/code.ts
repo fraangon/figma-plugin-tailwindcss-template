@@ -2,6 +2,7 @@ import {
   colorsToColorsWithUses,
   getColors,
   getVariables,
+  replaceColor,
 } from "./utils/getters";
 
 figma.showUI(__html__, { height: 600, width: 350 });
@@ -28,8 +29,6 @@ figma.on("run", onSelectionChange);
 
 figma.ui.onmessage = async (message) => {
   if (message.type === "replace-color") {
-    const { originalColor, newColor } = message;
-    console.log("originalColor", originalColor);
-    console.log("newColor", newColor);
+    replaceColor(message.originalColor, message.newColor);
   }
 };

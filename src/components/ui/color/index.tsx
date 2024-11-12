@@ -10,18 +10,15 @@ const getColorName = (color: ColorWithUses, variables: Variable[]) => {
 export default function Color({
   color,
   variables,
-  onColorReplace,
 }: {
   color: ColorWithUses;
   variables: Variable[];
-  onColorReplace: (originalColor: any, newColor: any) => void;
 }) {
   return (
-    <button
+    <div
       className={cn(
         "flex flex-row justify-start items-center p-2 gap-2 rounded-lg w-full transition-colors cursor-pointer bg-gray-100 border border-gray-200/50 hover:bg-gray-200"
       )}
-      onClick={() => onColorReplace(color, "#123123")}
     >
       <div className="w-full flex flex-row justify-start items-center gap-2">
         <div
@@ -45,6 +42,6 @@ export default function Color({
           {color.uses.length} times
         </span>
       )}
-    </button>
+    </div>
   );
 }

@@ -5,9 +5,7 @@ import { convertToRGBScale, rgbToHex } from "./colors";
 
 export async function getColors(node: SceneNode): Promise<Array<ColorUse>> {
   const nodesWithPaint = [node, ...findNodesWithPaint(node)];
-
   const componentColors = extractColorsFromNodes(nodesWithPaint);
-
   return componentColors;
 }
 
@@ -104,6 +102,9 @@ export function getVariables(collections: VariableCollection[]) {
   }, [] as any[]);
 }
 
+/**
+ * Replaces the color of all nodes that use a specific color with a new color
+ */
 export function replaceColor(color: ColorWithUses, newColor: ColorWithUses) {
   color.uses.forEach((use) => {
     const node = figma.getNodeById(use.nodeId);
@@ -113,32 +114,40 @@ export function replaceColor(color: ColorWithUses, newColor: ColorWithUses) {
       const properties = node[property];
 
       if (properties[0]?.type === "SOLID") {
+        // Create a deep copy to avoid mutations
         const clonedProperties = clone(properties);
-
-        console.log("replaceColor:newColor", newColor);
         const newHex = rgbToHex(newColor);
-        const newSolidPaint = figma.util.solidPaint(
-          newHex,
-          clonedProperties[0]
-        );
+
+        // Handle color variables if present
         if (newColor.variable) {
+          const newSolidPaint = figma.util.solidPaint(
+            newHex,
+            clonedProperties[0]
+          );
+
           if ("setBoundVariable" in node) {
             const variable = figma.variables.getVariableById(
               newColor.variable.id
             );
+
             const newSolidPaintWithVariable =
               figma.variables.setBoundVariableForPaint(
                 newSolidPaint,
                 "color",
                 variable
               );
+
             clonedProperties[0] = newSolidPaintWithVariable;
             node[property] = clonedProperties;
-          } else {
-            clonedProperties[0] = newSolidPaint;
-
-            node[property] = clonedProperties;
           }
+        } else {
+          const newSolidPaint = figma.util.solidPaint(newHex, {
+            ...clonedProperties[0],
+            boundVariables: {},
+          });
+
+          clonedProperties[0] = newSolidPaint;
+          node[property] = clonedProperties;
         }
       }
     }

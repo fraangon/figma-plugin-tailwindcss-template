@@ -64,56 +64,64 @@ export default function ColorsPage({
         ref={scrollContainerRef}
         className="flex flex-col justify-start items-start gap-2 w-full h-full overflow-y-scroll max-h-full relative"
       >
-        {colorsWithUses.length === 0 && (
-          <div className="flex flex-col justify-center items-center w-full h-full gap-2 pb-20">
-            <EmptyIlustration className="translate-x-[2px]" />
-            <span className="text-gray-400 text-xs max-w-[100px] text-center">
-              Start by selecting some elements.
-            </span>
-          </div>
-        )}
+        <div
+          className={cn(
+            "flex flex-col justify-center items-center w-full h-full gap-2 pb-20 absolute top-0 left-0 pointer-events-none transition-opacity duration-100",
+            colorsWithUses.length === 0 ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <EmptyIlustration className="translate-x-[2px]" />
+          <span className="text-gray-400 text-xs max-w-[100px] text-center">
+            Start by selecting some elements.
+          </span>
+        </div>
 
-        {colorsWithUses
-          .sort((a, b) => {
-            if (b.uses.length !== a.uses.length)
-              return b.uses.length - a.uses.length;
+        <div
+          ref={parent}
+          className="w-full h-fit gap-2 flex flex-col justify-start items-center"
+        >
+          {colorsWithUses
+            .sort((a, b) => {
+              if (b.uses.length !== a.uses.length)
+                return b.uses.length - a.uses.length;
 
-            return b.variable ? 1 : a.variable ? -1 : 0;
-          })
-          .map((color) => (
-            <div key={getColorKey(color) + "-container"} className="w-full">
-              <DropdownMenu.Root key={getColorKey(color) + "-dropdown"}>
-                <DropdownMenu.Trigger className="w-full outline-none">
-                  <Color
-                    key={getColorKey(color)}
-                    color={color}
-                    variables={variables}
-                  />
-                </DropdownMenu.Trigger>
+              return b.variable ? 1 : a.variable ? -1 : 0;
+            })
+            .map((color) => (
+              <div key={getColorKey(color) + "-container"} className="w-full">
+                <DropdownMenu.Root key={getColorKey(color) + "-dropdown"}>
+                  <DropdownMenu.Trigger className="w-full outline-none">
+                    <Color
+                      key={getColorKey(color)}
+                      color={color}
+                      variables={variables}
+                    />
+                  </DropdownMenu.Trigger>
 
-                <DropdownMenu.Content
-                  className="w-60 max-h-40 flex flex-col justify-start items-start gap-1 overflow-y-scroll bg-neutral-50 rounded-sm p-1 border border-neutral-200/50"
-                  sideOffset={2}
-                >
-                  {colorsWithUses
-                    .filter((c) => c.id !== color.id)
-                    .map((colorReplacer) => (
-                      <DropdownMenu.Item
-                        key={getColorKey(colorReplacer) + "-item"}
-                        className="w-full outline-none"
-                        onClick={() => onColorReplace(color, colorReplacer)}
-                      >
-                        <Color
-                          key={getColorKey(colorReplacer)}
-                          color={colorReplacer}
-                          variables={variables}
-                        />
-                      </DropdownMenu.Item>
-                    ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            </div>
-          ))}
+                  <DropdownMenu.Content
+                    className="w-60 max-h-40 flex flex-col justify-start items-start gap-1 overflow-y-scroll bg-neutral-50 rounded-sm p-1 border border-neutral-200/50"
+                    sideOffset={2}
+                  >
+                    {colorsWithUses
+                      .filter((c) => c.id !== color.id)
+                      .map((colorReplacer) => (
+                        <DropdownMenu.Item
+                          key={getColorKey(colorReplacer) + "-item"}
+                          className="w-full outline-none"
+                          onClick={() => onColorReplace(color, colorReplacer)}
+                        >
+                          <Color
+                            key={getColorKey(colorReplacer)}
+                            color={colorReplacer}
+                            variables={variables}
+                          />
+                        </DropdownMenu.Item>
+                      ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </div>
+            ))}
+        </div>
       </div>
 
       <div

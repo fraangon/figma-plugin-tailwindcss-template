@@ -4,6 +4,8 @@ import Color from "../../components/ui/color";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import EmptyIlustration from "./components/empty-ilustration";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useState, useRef, useEffect } from "react";
+import { cn } from "../../utils/cn";
 
 export default function ColorsPage({
   colorsWithUses,
@@ -17,22 +19,50 @@ export default function ColorsPage({
     newColor: ColorWithUses
   ) => void;
 }) {
-  const [parent, enableAnimations] = useAutoAnimate({
+  const [parent] = useAutoAnimate({
     duration: 150,
     easing: "ease-in-out",
   });
 
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isScrollable = scrollHeight > clientHeight;
+
+      if (!isScrollable) {
+        setIsAtTop(true);
+        setIsAtBottom(true);
+        return;
+      }
+
+      setIsAtTop(scrollTop === 0);
+      setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 1);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [colorsWithUses]);
+
   return (
-    <div className="max-h-[600px] w-full h-full flex flex-col justify-start items-start p-2 gap-1 bg-gray-50 ">
-      <div className="flex flex-row items-center w-full h-[30px]">
+    <div className="max-h-[600px] w-full h-full flex flex-col justify-start items-start p-2 gap-1 bg-gray-50 relative">
+      <div className="flex flex-row items-center w-full min-h-[30px]">
         <h1 className="font-semibold text-gray-950 text-sm tracking-tight px-2">
           Colors
         </h1>
       </div>
 
       <div
-        className="flex flex-col justify-start items-start gap-2 w-full h-full overflow-y-scroll max-h-full"
-        ref={parent}
+        ref={scrollContainerRef}
+        className="flex flex-col justify-start items-start gap-2 w-full h-full overflow-y-scroll max-h-full relative"
       >
         {colorsWithUses.length === 0 && (
           <div className="flex flex-col justify-center items-center w-full h-full gap-2 pb-20">
@@ -85,6 +115,22 @@ export default function ColorsPage({
             </div>
           ))}
       </div>
+
+      <div
+        className={cn(
+          "absolute top-[38px] left-0 w-full h-[30px] bg-gradient-to-b from-gray-50 to-transparent transition-all duration-100 pointer-events-none",
+          isAtTop ? "opacity-0" : "opacity-100"
+        )}
+        key="top-gradient"
+      />
+
+      <div
+        className={cn(
+          "absolute bottom-[8px] left-0 w-full h-[30px] bg-gradient-to-t from-gray-50 to-transparent transition-all duration-100 pointer-events-none",
+          isAtBottom ? "opacity-0" : "opacity-100"
+        )}
+        key="bottom-gradient"
+      />
     </div>
   );
 }

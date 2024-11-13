@@ -16,6 +16,9 @@ export const ITEMS = [
     component: CommingSoonPage,
   },
   {
+    divider: true,
+  },
+  {
     id: "replace",
     label: "Replace for variables",
     icon: Icon.Replace,

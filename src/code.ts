@@ -2,6 +2,7 @@ import {
   colorsToColorsWithUses,
   getColors,
   getVariables,
+  replaceAll,
   replaceColor,
 } from "./utils/getters";
 
@@ -30,6 +31,12 @@ figma.on("run", onSelectionChange);
 figma.ui.onmessage = async (message) => {
   if (message.type === "replace-color") {
     replaceColor(message.originalColor, message.newColor);
+
+    return onSelectionChange();
+  }
+
+  if (message.type === "replace-all") {
+    replaceAll(message.colorsGroups);
 
     return onSelectionChange();
   }

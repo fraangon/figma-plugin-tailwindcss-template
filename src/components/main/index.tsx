@@ -56,8 +56,14 @@ export const Main = (props: any) => {
       </div>
       <div className="w-full h-full flex flex-col max-h-[600px] overflow-hidden">
         {ITEMS.map((item) => (
-          <TabsContent key={item.id} value={item.id} className="w-full h-full">
-            <item.component {...props} />
+          <TabsContent
+            key={item.id + "-page"}
+            value={item.id}
+            className="w-full h-full"
+          >
+            {item.component && typeof item.component === "function" ? (
+              <item.component {...props} />
+            ) : null}
           </TabsContent>
         ))}
       </div>

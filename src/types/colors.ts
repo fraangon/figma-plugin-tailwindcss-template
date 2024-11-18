@@ -51,3 +51,8 @@ export interface ColorUse {
   nodeId: string;
   property: "fills" | "strokes";
 }
+
+export interface ReplaceGroup {
+  from: ColorWithUses[];
+  to: ColorWithUses;
+}

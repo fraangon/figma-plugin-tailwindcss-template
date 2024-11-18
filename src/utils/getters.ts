@@ -1,5 +1,5 @@
 import { getColorKey } from "../components/home/utils";
-import { ColorUse, ColorWithUses } from "../types/colors";
+import { ColorUse, ColorWithUses, ReplaceGroup } from "../types/colors";
 import { clone } from "./clone";
 import { convertToRGBScale, rgbToHex } from "./colors";
 
@@ -151,5 +151,13 @@ export function replaceColor(color: ColorWithUses, newColor: ColorWithUses) {
         }
       }
     }
+  });
+}
+
+export function replaceAll(colorsGroups: ReplaceGroup[]) {
+  colorsGroups.forEach((group) => {
+    group.from.forEach((color) => {
+      replaceColor(color, group.to);
+    });
   });
 }

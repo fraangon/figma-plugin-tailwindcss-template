@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Main } from "../main";
 import { TooltipProvider } from "../ui/tooltip";
+import { ReplaceGroup } from "../../types/colors";
 
 export const Home = () => {
   const [colorsWithUses, setColorsWithUses] = useState([]);
@@ -30,12 +31,25 @@ export const Home = () => {
     );
   };
 
+  const handleReplaceAll = (colorsGroups: ReplaceGroup[]) => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "replace-all",
+          colorsGroups,
+        },
+      },
+      "*"
+    );
+  };
+
   return (
     <TooltipProvider>
       <Main
         colorsWithUses={colorsWithUses}
         variables={variables}
         onColorReplace={handleColorReplace}
+        onReplaceAll={handleReplaceAll}
       />
     </TooltipProvider>
   );

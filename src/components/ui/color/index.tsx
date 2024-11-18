@@ -7,20 +7,33 @@ const getColorName = (color: ColorWithUses, variables: Variable[]) => {
   return variable?.name || rgbToHex({ r: color.r, g: color.g, b: color.b });
 };
 
+const isVariable = (color: ColorWithUses, variables: Variable[]) => {
+  return !variables.find((v) => v.id === color.variable?.id)?.name;
+};
+
 export default function Color({
   color,
   variables,
+  options = {
+    timesSmall: false,
+    clickable: true,
+  },
 }: {
   color: ColorWithUses;
   variables: Variable[];
+  options?: {
+    timesSmall?: boolean;
+    clickable?: boolean;
+  };
 }) {
   return (
     <div
       className={cn(
-        "flex flex-row justify-start items-center p-2 gap-2 rounded-lg w-full transition-colors cursor-pointer bg-gray-100 border border-gray-200/50 hover:bg-gray-200"
+        "flex flex-row justify-start items-center p-2 gap-2 rounded-lg w-full transition-colors bg-gray-100 border border-gray-200/50",
+        options.clickable && "cursor-pointer hover:bg-gray-200"
       )}
     >
-      <div className="w-full flex flex-row justify-start items-center gap-2">
+      <div className="w-full flex flex-row justify-start items-center gap-2 max-w-full text-ellipsis overflow-hidden">
         <div
           className="h-4 min-w-4 w-4 rounded-full border border-gray-200/50"
           style={{
@@ -29,8 +42,8 @@ export default function Color({
         />
         <h3
           className={cn(
-            "text-xs leading-none font-medium text-gray-950 tracking-tight",
-            !color.variable && "uppercase"
+            "text-xs leading-none font-medium text-gray-950 tracking-tight max-w-full text-ellipsis overflow-hidden",
+            isVariable(color, variables) && "uppercase"
           )}
         >
           {getColorName(color, variables)}
@@ -39,7 +52,11 @@ export default function Color({
 
       {color?.uses?.length > 0 && (
         <span className="text-[10px] leading-none uppercase min-w-fit py-0.5 px-1 border border-gray-400/20 rounded bg-gray-200 text-gray-700 tracking-tight">
-          {color.uses.length} times
+          {options.timesSmall
+            ? color.uses.length > 99
+              ? `99+`
+              : color.uses.length
+            : color.uses.length + " times"}
         </span>
       )}
     </div>
